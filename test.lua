@@ -1,6 +1,6 @@
-package.path = '?.lua;' .. package.path
+package.path = '?/init.lua;' .. package.path
 
-local gamepadguesser = require "init"
+local gamepadguesser = require "gamepadguesser"
 
 local function script_path()
     local str = debug.getinfo(2, "S").source

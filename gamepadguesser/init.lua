@@ -48,9 +48,8 @@ end
 -- Load gamepad db to get support for more gamepads.
 --
 -- Call from love.load.
-function gamepadguesser.loadMappings()
-    local fpath = package.searchpath('gamepadguesser', package.path)
-    fpath = fpath:gsub("init.lua", "assets/db/gamecontrollerdb.txt")
+function gamepadguesser.loadMappings(path_to_gamepadguesser)
+    local fpath = path_to_gamepadguesser .. "/assets/db/gamecontrollerdb.txt"
     love.joystick.loadGamepadMappings(fpath)
 end
 
