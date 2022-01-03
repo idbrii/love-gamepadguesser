@@ -47,6 +47,12 @@ end
 ```
 
 
+## Caveats
+
+lovejs returns `nil` for `getGamepadMappingString()` and `getName()` produces
+generic names, so all gamepads appear to be xbox gamepads in web builds.
+
+
 ## License
 
 * gamepadguesser - idbrii - MIT

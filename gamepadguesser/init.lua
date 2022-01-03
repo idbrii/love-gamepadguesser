@@ -80,7 +80,12 @@ end
 -- Returns:
 --  One value from gamepadguesser.CONSOLES.
 function gamepadguesser.joystickToConsole(joystick)
-    local name = getNameFromMapping(joystick:getGamepadMappingString())
+    local name
+    local mapping = joystick:getGamepadMappingString()
+    -- lovejs doesn't support mapping strings.
+    if mapping then
+        name = getNameFromMapping(mapping)
+    end
     if not name or name:len() < 3 then
         name = joystick:getName()
     end

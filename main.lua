@@ -37,6 +37,9 @@ function love.gamepadaxis(joystick, axis, value)
 end
 
 function love.draw()
+    if love.system.getOS() == 'Web' then
+        love.graphics.printf("lovejs makes all gamepads appear to be xbox!", 0, 0, 1000)
+    end
     love.graphics.draw(instruction.text, centre.x - instruction.width/2, 75)
     if image then
         local w,h = image:getDimensions()
