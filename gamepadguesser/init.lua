@@ -10,6 +10,12 @@
 
 local gamepadguesser = {}
 
+gamepadguesser.CONSOLES = {
+    "nintendo",
+    "playstation",
+    "sega",
+    "xbox",
+}
 
 local all_patterns = {
     playstation = {
@@ -72,17 +78,76 @@ end
 -- Useful to get map to a folder name containing input images.
 --
 -- Returns:
---   "nintendo"
---   "playstation"
---   "sega"
---   or
---   "xbox"
+--  One value from gamepadguesser.CONSOLES.
 function gamepadguesser.joystickToConsole(joystick)
     local name = getNameFromMapping(joystick:getGamepadMappingString())
     if not name or name:len() < 3 then
         name = joystick:getName()
     end
     return gamepadguesser.joystickNameToConsole(name)
+end
+
+
+local function Class()
+    local cls = {}
+    cls.__index = cls
+    setmetatable(cls, {
+            __call = function(cls_, ...)
+                local obj = setmetatable({}, cls)
+                obj:ctor(...)
+                return obj
+            end
+        })
+    return cls
+end
+local JoystickData = Class()
+
+function JoystickData:ctor(path_to_gamepadguesser)
+    self.joysticks = {}
+    self.images = {}
+    for i,console in ipairs(gamepadguesser.CONSOLES) do
+        self.images[console] = setmetatable({}, {
+                __index = function(t, name)
+                    local prefix = name:match("(%w+)[xy]$")
+                    if prefix then
+                        name = prefix
+                    end
+                    local fmt = "%s/assets/images/%s/%s.png"
+                    local fpath = fmt:format(path_to_gamepadguesser, console, name)
+                    local im = love.graphics.newImage(fpath)
+                    t[name] = im
+                    if prefix then
+                        -- We use the same image for left, leftx, lefty since
+                        -- they're all the left stick.
+                        t[prefix.."x"] = im
+                        t[prefix.."y"] = im
+                        name = prefix
+                    end
+                    return rawget(t, name)
+                end
+            })
+    end
+end
+
+function JoystickData:addJoystick(joystick)
+    local console = gamepadguesser.joystickToConsole(joystick)
+    self.joysticks[joystick] = console
+end
+
+function JoystickData:getImage(joystick, input)
+    local console = self.joysticks[joystick]
+    if not console then
+        self:addJoystick(joystick)
+        console = self.joysticks[joystick]
+    end
+    return self.images[console][input]
+end
+
+function gamepadguesser.createJoystickData(path_to_gamepadguesser, skip_loading_db)
+    if not skip_loading_db then
+        gamepadguesser.loadMappings(path_to_gamepadguesser)
+    end
+    return JoystickData(path_to_gamepadguesser)
 end
 
 return gamepadguesser
