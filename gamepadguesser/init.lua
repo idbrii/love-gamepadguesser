@@ -141,6 +141,22 @@ function JoystickData:addJoystick(joystick)
     end
 end
 
+-- Force input joystick to return a specific console instead of autodetecting.
+-- Useful to allow users to customize their button prompts when gamepads are
+-- incorrectly configured.
+--
+-- console: should be an element in gamepadguesser.CONSOLES or nil. Resumes
+--      autodetection if console is nil.
+function JoystickData:overrideConsole(joystick, console)
+    self.joysticks[joystick] = console
+    self:addJoystick(joystick)
+end
+
+-- Return an Image in the style of the joystick for the given input. Caches the
+-- created Image, so this is safe to call directly from love.draw.
+--
+-- input: the name of the input. Should be an element of GamepadButton or
+--      GamepadAxis.
 function JoystickData:getImage(joystick, input)
     self:addJoystick(joystick)
     local console = self.joysticks[joystick]
