@@ -1,6 +1,11 @@
+-- See TUT comments for things you might want to do in your game.
+
+
+
 -- Show output immediately (for debugging).
 io.stdout:setvbuf("no")
 
+-- TUT: require the module.
 local gamepadguesser = require "gamepadguesser"
 
 local joy
@@ -70,6 +75,9 @@ local function create_selector(x, y, target_gamepad)
                 -- Pass nil to return to automatic
                 console = nil
             end
+            -- TUT: If you provide a setting to override autodetection, assign
+            -- it with overrideConsole using a value from
+            -- gamepadguesser.CONSOLES.
             joy:overrideConsole(self.target_gamepad, console)
         end,
 
@@ -95,6 +103,7 @@ local function create_selector(x, y, target_gamepad)
     selector.text_y = y + selector.btn_prev.h / 2 - 10
     selector.text = love.graphics.newText(love.graphics.getFont())
     selector.label = love.graphics.newText(love.graphics.getFont())
+    -- TUT: Label your gamepads in settings using a useful name.
     selector.label:setf(gamepadguesser.getJoystickName(target_gamepad), 200, "left")
     selector:refresh(gamepad)
     return selector
@@ -103,7 +112,9 @@ local console_selectors = {}
 
 
 function love.load()
+    -- TUT: Create JoystickData. It's the easiest entrypoint into gamepadguesser.
     joy = gamepadguesser.createJoystickData("gamepadguesser")
+
     centre.x, centre.y = love.window.getMode()
     centre.x = centre.x * 0.5
     centre.y = centre.y * 0.5
@@ -115,6 +126,7 @@ function love.load()
 end
 
 function love.joystickadded(joystick)
+    -- TUT: You might assign the first joystick you see to players.
     if joystick:isGamepad() then
         gamepad = joystick
         local y = 10 + 40 * (#console_selectors)
@@ -123,6 +135,7 @@ function love.joystickadded(joystick)
 end
 
 function love.gamepadpressed(joystick, button)
+    -- TUT: You might assign joysticks to players when buttons are pressed.
     gamepad = joystick
     action = button
     press.text:setf(button, press.width, "center")
@@ -168,6 +181,7 @@ function love.draw()
         h = h * scale
         love.graphics.draw(art, centre.x - w/2, centre.y - h/2 + 180, nil, scale, scale)
 
+        -- TUT: Draw some fake ui using the A button.
         art = joy:getImage(gamepad, "a")
         w,h = art:getDimensions()
         scale = 0.25
