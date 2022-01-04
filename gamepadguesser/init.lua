@@ -136,16 +136,14 @@ function JoystickData:ctor(path_to_gamepadguesser)
 end
 
 function JoystickData:addJoystick(joystick)
-    local console = gamepadguesser.joystickToConsole(joystick)
-    self.joysticks[joystick] = console
+    if not self.joysticks[joystick] then
+        self.joysticks[joystick] = gamepadguesser.joystickToConsole(joystick)
+    end
 end
 
 function JoystickData:getImage(joystick, input)
+    self:addJoystick(joystick)
     local console = self.joysticks[joystick]
-    if not console then
-        self:addJoystick(joystick)
-        console = self.joysticks[joystick]
-    end
     return self.images[console][input]
 end
 
