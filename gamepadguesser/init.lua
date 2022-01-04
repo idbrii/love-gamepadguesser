@@ -74,13 +74,11 @@ function gamepadguesser.joystickNameToConsole(name)
     return "xbox"
 end
 
--- Map a love2d Joystick to a console.
+-- Get a specific name for a gamepad.
 --
--- Useful to get map to a folder name containing input images.
---
--- Returns:
---  One value from gamepadguesser.CONSOLES.
-function gamepadguesser.joystickToConsole(joystick)
+-- Generally more descriptive than Joystick:getName because we use the
+-- community-provided name instead of the driver name.
+function gamepadguesser.getJoystickName(joystick)
     local name
     local mapping = joystick:getGamepadMappingString()
     -- lovejs doesn't support mapping strings.
@@ -90,6 +88,18 @@ function gamepadguesser.joystickToConsole(joystick)
     if not name or name:len() < 3 then
         name = joystick:getName()
     end
+    return name
+end
+
+
+-- Map a love2d Joystick to a console.
+--
+-- Useful to get map to a folder name containing input images.
+--
+-- Returns:
+--  One value from gamepadguesser.CONSOLES.
+function gamepadguesser.joystickToConsole(joystick)
+    local name = gamepadguesser.getJoystickName(joystick)
     return gamepadguesser.joystickNameToConsole(name)
 end
 

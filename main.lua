@@ -95,7 +95,7 @@ local function create_selector(x, y, target_gamepad)
     selector.text_y = y + selector.btn_prev.h / 2 - 10
     selector.text = love.graphics.newText(love.graphics.getFont())
     selector.label = love.graphics.newText(love.graphics.getFont())
-    selector.label:setf(target_gamepad:getName(), 200, "left")
+    selector.label:setf(gamepadguesser.getJoystickName(target_gamepad), 200, "left")
     selector:refresh(gamepad)
     return selector
 end
