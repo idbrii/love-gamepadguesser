@@ -16,27 +16,6 @@ local instruction = {
 local fakeui = {
     width = 100,
 }
-local selector = {
-    width = 100,
-    choices = { "Auto", },
-    current = 1,
-    x = 650,
-    y = 10,
-    refresh = function(self)
-        local console = self.choices[self.current]
-        self.text:setf(console, self.width, "center")
-        if gamepad then
-            if console == "Auto" then
-                -- Pass nil to return to automatic
-                console = nil
-            end
-            joy:overrideConsole(gamepad, console)
-        end
-    end
-}
-for _,val in ipairs(gamepadguesser.CONSOLES) do
-    table.insert(selector.choices, val)
-end
 
 local function create_arrow_button(x, y, point_right)
     local function draw_button(self)
@@ -69,8 +48,59 @@ local function create_arrow_button(x, y, point_right)
         point_right = point_right,
     }
 end
-local btn_prev = create_arrow_button(selector.x - 30, selector.y, false)
-local btn_next = create_arrow_button(selector.x + selector.width, selector.y, true)
+
+local selector_choices = { "Auto", }
+for _,val in ipairs(gamepadguesser.CONSOLES) do
+    table.insert(selector_choices, val)
+end
+local function create_selector(x, y, target_gamepad)
+    assert(target_gamepad)
+    local selector = {
+        target_gamepad = target_gamepad,
+        width = 100,
+        choices = selector_choices,
+        current = 1,
+        x = x,
+        y = y,
+
+        refresh = function(self)
+            local console = self.choices[self.current]
+            self.text:setf(console, self.width, "center")
+            if console == "Auto" then
+                -- Pass nil to return to automatic
+                console = nil
+            end
+            joy:overrideConsole(self.target_gamepad, console)
+        end,
+
+        draw = function(self)
+            love.graphics.setColor(1,1,1,1)
+            love.graphics.draw(self.label, self.btn_prev.x - self.label:getWidth() - 10, self.text_y)
+            love.graphics.draw(self.text, self.x, self.text_y)
+            self.btn_next:draw()
+            self.btn_prev:draw()
+        end,
+
+        on_mousepressed = function(self, mx, my)
+            if self.btn_prev:contains(mx,my) then
+                self.current = math.max(self.current - 1, 1)
+            elseif self.btn_next:contains(mx,my) then
+                self.current = math.min(self.current + 1, #self.choices)
+            end
+            self:refresh(gamepad)
+        end,
+    }
+    selector.btn_prev = create_arrow_button(selector.x - 30, selector.y, false)
+    selector.btn_next = create_arrow_button(selector.x + selector.width, selector.y, true)
+    selector.text_y = y + selector.btn_prev.h / 2 - 10
+    selector.text = love.graphics.newText(love.graphics.getFont())
+    selector.label = love.graphics.newText(love.graphics.getFont())
+    selector.label:setf(target_gamepad:getName(), 200, "left")
+    selector:refresh(gamepad)
+    return selector
+end
+local console_selectors = {}
+
 
 function love.load()
     joy = gamepadguesser.createJoystickData("gamepadguesser")
@@ -79,16 +109,16 @@ function love.load()
     centre.y = centre.y * 0.5
     press.text = love.graphics.newText(love.graphics.getFont())
     instruction.text = love.graphics.newText(love.graphics.getFont())
-    instruction.text:setf("Press a gamepad button.", instruction.width, "center")
+    instruction.text:setf("Press a gamepad button.", instruction.width, "left")
     fakeui.text = love.graphics.newText(love.graphics.getFont())
     fakeui.text:setf("Jump", fakeui.width, "left")
-    selector.text = love.graphics.newText(love.graphics.getFont())
-    selector:refresh()
 end
 
 function love.joystickadded(joystick)
     if joystick:isGamepad() then
         gamepad = joystick
+        local y = 10 + 40 * (#console_selectors)
+        table.insert(console_selectors, create_selector(650, y, gamepad))
     end
 end
 
@@ -109,12 +139,9 @@ end
 
 function love.mousepressed(mx, my, btn)
     if btn == 1 then
-        if btn_prev:contains(mx,my) then
-            selector.current = math.max(selector.current - 1, 1)
-        elseif btn_next:contains(mx,my) then
-            selector.current = math.min(selector.current + 1, #selector.choices)
+        for _,selector in ipairs(console_selectors) do
+            selector:on_mousepressed(mx, my, btn)
         end
-        selector:refresh()
     end
 end
 
@@ -122,9 +149,9 @@ function love.draw()
     love.graphics.setColor(1,1,1,1)
 
     if love.system.getOS() == 'Web' then
-        love.graphics.printf("lovejs makes all gamepads appear to be xbox!", 0, 0, 1000)
+        love.graphics.printf("lovejs makes all gamepads appear to be xbox!", 10, 10, 1000)
     end
-    love.graphics.draw(instruction.text, centre.x - instruction.width/2, 75)
+    love.graphics.draw(instruction.text, 50, 50)
     if gamepad then
         if action then
             local art = joy:getImage(gamepad, action)
@@ -154,9 +181,9 @@ function love.draw()
         love.graphics.draw(art, ui_x, ui_y, nil, scale, scale)
     end
 
-    love.graphics.draw(selector.text, selector.x, selector.y)
-    btn_next:draw()
-    btn_prev:draw()
+    for _,selector in ipairs(console_selectors) do
+        selector:draw()
+    end
     
 end
 
