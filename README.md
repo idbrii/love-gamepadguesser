@@ -1,14 +1,19 @@
 # GamepadGuesser
 
-Guess what a gamepad should look like and provide a default set of art that
+[![Requires love2d 11.3+](https://img.shields.io/badge/L%F6ve-11.3-pink.svg)](https://love2d.org/)
+
+Guesses what a gamepad should look like and provides a default set of art that
 matches the input gamepad.
 
-*Not an input mapping library. If you want to define input bindings, I recommend [baton](https://github.com/tesselode/baton).*
+*Not an input mapping library. If you want to define input bindings, I
+recommend [baton](https://github.com/tesselode/baton).*
+
 
 Simplify showing gamepad icons with gamepadguesser. It loads the extensive
-[SDL_GameControllerDB](https://github.com/gabomdq/SDL_GameControllerDB), maps
-joysticks to appearance (console-specific buttons like Xbox, PS, Nintendo), and
-builds images as you request them.
+[SDL_GameControllerDB](https://github.com/gabomdq/SDL_GameControllerDB) for
+better gamepad support, maps joysticks to appearance (console-specific buttons
+like Xbox, Nintendo, ...), and builds images on demand for each GamepadButton
+and GamepadAxis.
 
 You can start displaying the correct image for your buttons in only a few lines
 of code:
@@ -16,17 +21,22 @@ of code:
 ```lua
 local gamepadguesser = require "gamepadguesser"
 
+local joy = gamepadguesser.createJoystickData("gamepadguesser")
+
 function love.gamepadpressed(joystick, button)
-    joy = joy or gamepadguesser.createJoystickData("gamepadguesser")
-    image = joy:getImage(joystick, button)
+    gamepad = joystick
+    btn = button
 end
 
 function love.draw()
-    if image then
-        love.graphics.draw(image, 0, 0)
+    if btn then
+        love.graphics.draw(joy:getImage(gamepad, btn), 0, 0)
     end
 end
 ```
+
+GamepadGuesser caches each image it creates, so you can call getImage in draw
+without worrying about garbage.
 
 See main.lua for a more extensive example.
 
@@ -34,7 +44,8 @@ See main.lua for a more extensive example.
 You can also use gamepadguesser with your own art. The easiest way is to modify
 the art in gamepadguesser/assets/images/ to ensure the correct file names.
 
-You can also get the name of the console associated with the joystick:
+You can also get the name of the console associated with the joystick ("xbox",
+"playstation", "nintendo"):
 
 ```lua
 function love.gamepadpressed(joystick, button)
@@ -52,6 +63,8 @@ end
 lovejs returns `nil` for `getGamepadMappingString()` and `getName()` produces
 generic names, so all gamepads appear to be xbox gamepads in web builds.
 
+Requires love2d 11.3+ because getting gamepad names depends on
+[getGamepadMappingString](https://love2d.org/wiki/Joystick:getGamepadMappingString).
 
 ## License
 
