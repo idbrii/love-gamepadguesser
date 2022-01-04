@@ -1,6 +1,6 @@
 # GamepadGuesser
 
-[![Requires love2d 11.3+](https://img.shields.io/badge/L%F6ve-11.3-pink.svg)](https://love2d.org/)
+[![Requires love2d 11.3+](https://img.shields.io/badge/L%F6ve-11.3%2B-pink.svg)](https://love2d.org/)
 
 Guesses what a gamepad should look like and provides a default set of art that
 matches the input gamepad.
