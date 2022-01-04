@@ -57,6 +57,10 @@ function love.draw()
 end
 ```
 
+Calling `gamepadguesser` functions directly doesn't automatically load
+SDL_GameControllerDB. You can call
+`gamepadguesser.loadMappings(path_to_gamepadguesser)` to load them yourself.
+
 
 ## Caveats
 
