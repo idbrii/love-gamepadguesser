@@ -41,6 +41,20 @@ without worrying about garbage.
 See main.lua for a more extensive example.
 
 
+## Disabling Autodetection
+
+Autodetection may be imperfect, so you can set an override to force a specific
+console visual:
+```
+joy:overrideConsole(joystick, "nintendo")
+```
+You can use `gamepadguesser.CONSOLES` to provide a list of options in your
+settings menu (also include an "auto" option that passes `nil` to
+overrideConsole.
+
+
+## Low-level operation
+
 You can also use gamepadguesser with your own art. The easiest way is to modify
 the art in gamepadguesser/assets/images/ to ensure the correct file names.
 
