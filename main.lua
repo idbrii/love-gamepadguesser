@@ -189,7 +189,7 @@ function love.draw()
         h = h * scale
         local ui_x,ui_y = love.window.getMode()
         ui_x = ui_x - fakeui.width
-        ui_y = ui_y - 40
+        ui_y = ui_y - h - 20
         love.graphics.draw(fakeui.text, ui_x, ui_y)
         ui_x,ui_y = ui_x - w - 10, ui_y - 5
         love.graphics.draw(art, ui_x, ui_y, nil, scale, scale)
@@ -198,6 +198,6 @@ function love.draw()
     for _,selector in ipairs(console_selectors) do
         selector:draw()
     end
-    
+
 end
 
